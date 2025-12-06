@@ -1,56 +1,4 @@
-#wykład t1 t2 z dodatkowymi informacjami i wykresami 
 
-#PRZYGOTOWANIE TABEL POD ANALIZE ################################################
-
-#zrobienie id uczestnika dla wyklad t1
-library(dplyr)
-
-wyklad_t1 <- wyklad_t1 |>
-  mutate(id_t1 = paste0(Code_1, Code_2, Code_3, Code_4))
-
-
-#zrobienie id uczestnika dla wyklad t2 
-
-
-wyklad_t2 <- wyklad_t2 |>
-  mutate(id_t2 = paste0(Code_1, Code_2, Code_3, Code_4))
-
-
-#zrobienie w wyklad t1 w id_t1 malych liter 
-wyklad_t1 <- wyklad_t1 |>
-  mutate(id_t1 = tolower(id_t1))
-
-
-#zrobienie w wyklad t2 w id_t2 malych liter 
-wyklad_t2 <- wyklad_t2 |>
-  mutate(id_t2 = tolower(id_t2))
-
-#łaczenie tabel
-
-wyklad_t1 <- wyklad_t1 |> rename(id = id_t1)
-wyklad_t2 <- wyklad_t2 |> rename(id = id_t2)
-
-wyklad_t1_2 <- inner_join(wyklad_t1, wyklad_t2, by = "id")
-
-
-#KONIEC PRZYGOTOWANIA ########################################################
-
-library(dplyr)
-library(tidyr)
-library(purrr)
-library(broom)
-library(gt)
-library(ggplot2)
-
-#-------------------------------------------------------
-# 0) Dodajemy zmienne mean_Gender_ess_1 i mean_Gender_ess_2
-#-------------------------------------------------------
-
-wyklad_t1_2 <- wyklad_t1_2 |>
-  mutate(
-    mean_Gender_ess_1 = (Gender_ess_1.x + Gender_ess_1.y) / 2,
-    mean_Gender_ess_2 = (Gender_ess_2.x + Gender_ess_2.y) / 2
-  )
 
 
 library(dplyr)
@@ -60,9 +8,9 @@ library(broom)
 library(purrr)  
 library(gt)
 
-#-------------------------------------------------------
-# 1) Lista par zmiennych (dodajemy mean-y jako szóstą parę)
-#-------------------------------------------------------
+
+# pairs variables
+
 
 pairs <- list(
   c("Gender_ess_1.x", "Gender_ess_1.y"),
@@ -73,9 +21,8 @@ pairs <- list(
   c("mean_Gender_ess_1", "mean_Gender_ess_2")
 )
 
-#-------------------------------------------------------
-# 2) Funkcja do t-testu zależnego
-#-------------------------------------------------------
+
+# t test function
 
 run_ttest <- function(var_x, var_y) {
   t.test(
@@ -92,15 +39,14 @@ run_ttest <- function(var_x, var_y) {
     )
 }
 
-#-------------------------------------------------------
-# 3) Uruchomienie testów
-#-------------------------------------------------------
+# run tests
+
 
 results <- map_df(pairs, ~run_ttest(.x[1], .x[2]))
 
-#-------------------------------------------------------
-# 4) Tabela wynikowa (ładna)
-#-------------------------------------------------------
+
+#  tabela wynikowa (ładna)
+
 
 results_table <- results |>
   select(variable, statistic, p.value, parameter, estimate, significant) |>
@@ -125,9 +71,9 @@ results_table |>
     title = "Wyniki testów t dla prób zależnych – wykład/warsztat"
   )
 
-#-------------------------------------------------------
-# 5) Tabela śr + SD dla wszystkich zmiennych (T1 i T2)
-#-------------------------------------------------------
+
+# tabela śr + SD dla wszystkich zmiennych (T1 i T2)
+
 
 mean_sd_table <- map_df(pairs, function(pair) {
   var_x <- pair[1]
@@ -148,9 +94,9 @@ mean_sd_table |>
   gt() |>
   tab_header(title = "Średnie i odchylenia standardowe T1 vs T2")
 
-#-------------------------------------------------------
-# 6) Wykres spaghetti (połączone punkty T1 → T2)
-#-------------------------------------------------------
+
+# spaghetti plots
+
 
 spaghetti_plots <- map(pairs, function(pair) {
   var_x <- pair[1]
@@ -170,7 +116,7 @@ spaghetti_plots <- map(pairs, function(pair) {
     theme_minimal()
 })
 
-spaghetti_plots  # wyświetla listę wykresów
+spaghetti_plots  #  lista wykresów
 
 #dodatkowa analiza pod WYKLAD T1 i PO WARSZTACIE 
 #PRZYGOTOWANIE TABELI POD ANALIZE###########################################
