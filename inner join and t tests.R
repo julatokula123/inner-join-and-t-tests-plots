@@ -22,7 +22,7 @@ wyklad_t1 <- wyklad_t1 |>
 wyklad_t2 <- wyklad_t2 |>
   mutate(id_t2 = tolower(id_t2))
 
-łaczenie tabeli 
+#łaczenie tabeli 
 
 wyklad_t1 <- wyklad_t1 |> rename(id = id_t1)
 wyklad_t2 <- wyklad_t2 |> rename(id = id_t2)
@@ -62,7 +62,7 @@ run_ttest <- function(var_x, var_y) {
     )
 }
 
-# 1) WYLICZENIE 5 TESTÓW
+# 1) 5x t tests
 results <- map_df(pairs, ~ run_ttest(.x[1], .x[2]))
 
 # 2) TABELA WYNIKOWA
